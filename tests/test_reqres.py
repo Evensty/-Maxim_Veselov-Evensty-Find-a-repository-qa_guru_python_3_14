@@ -1,11 +1,20 @@
+import os
+
 from pytest_voluptuous import S
 
 from schemas.user import new_user_schema, user_register_schema
 from config import post_login_body_invalid, post_login_body, put_users_body
 from users_responses import post_user, put_user, post_login, delete_user, post_register_users
+from utils.base_session import BaseSession
+from dotenv import load_dotenv
+
+load_dotenv()
+base_url = os.getenv('base_url')
 
 
 class TestUsers:
+    reqres = BaseSession(base_url)
+
     def test_post_users_check_status(self):
         response = post_user()
         assert response.status_code == 201

@@ -29,5 +29,4 @@ post_login_body_invalid = {
 post_login_body = {
     "email": "eve.holt@reqres.in",
     "password": "cityslicka"
-
     }

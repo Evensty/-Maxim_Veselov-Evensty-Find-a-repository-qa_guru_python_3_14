@@ -152,6 +152,31 @@ def test_add_digital_downloads_to_wishlist(demoshop, clean_wishlist):
     browser.all('.product>[href]').should(have.texts('3rd Album', 'Music 2', 'Music 2'))
 
 
+def test_compare_desctop_PCs(demoshop):
+    response = demoshop.post("/login", json={"Email": "demo_webshop@test.com", "Password": "123123"},
+                             allow_redirects=False)
+    authorization_cookie = response.cookies.get("NOPCOMMERCE.AUTH")
+    browser.open("/Themes/DefaultClean/Content/images/logo.png")
+    browser.driver.add_cookie({"name": "NOPCOMMERCE.AUTH", "value": authorization_cookie})
+    browser.open('https://demowebshop.tricentis.com/desktops')
+    browser.element('.product-title>[href="/build-your-cheap-own-computer"]').click()
+    browser.element('[type="radio"][value="65"]').click()
+    browser.element('[type="radio"][value="55"]').click()
+    browser.element('[type="radio"][value="58"]').click()
+    browser.element('[type="radio"][value="94"]').click()
+    browser.element('[type = "button"][value="Add to compare list"]').click()
+    browser.element('.clear-list').click()
+    browser.element('.page-body').should(have.text('You have no items to compare.'))
+
+
+
+
+
+
+
+
+
+
 
 
     

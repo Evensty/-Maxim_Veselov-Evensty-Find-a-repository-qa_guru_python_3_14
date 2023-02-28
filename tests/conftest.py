@@ -11,12 +11,13 @@ from utils.base_session import BaseSession
 load_dotenv()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def demoshop():
     api_url = os.getenv("API_URL")
     return BaseSession(api_url)
 
 
+@pytest.fixture(scope='session')
 def reqres():
     base_url = os.getenv('base_url')
     return BaseSession(base_url)
@@ -46,6 +47,12 @@ def clean_wishlist():
         checkbox.click()
     browser.element('[value="Update wishlist"]').click()
     browser.element('.wishlist-content').should(have.text('The wishlist is empty!'))
+
+
+@pytest.fixture()
+def clear_compare_list():
+    yield
+
 
 
 

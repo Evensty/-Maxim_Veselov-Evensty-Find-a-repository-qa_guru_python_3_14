@@ -52,6 +52,8 @@ def clean_wishlist():
 @pytest.fixture()
 def clear_compare_list():
     yield
+    browser.element('.clear-list').click()
+    browser.element('.page-body').should(have.text('You have no items to compare.'))
 
 
 

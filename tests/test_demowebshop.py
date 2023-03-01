@@ -1,21 +1,13 @@
 import os
-from time import sleep
 
-import allure
-import pytest
 import requests
 from faker import Faker
-
 
 from allure_commons._allure import step
 from selene import have
 from selene.support.conditions import be
 from selene.support.shared import browser
 from dotenv import load_dotenv
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-
 from utils.base_session import BaseSession
 
 fake = Faker()
@@ -95,8 +87,9 @@ def test_check_cart_quantity(demoshop, clean_cart):
     demoshop.post('/addproducttocart/catalog/22/1/1')
     demoshop.post('/addproducttocart/catalog/45/1/1')
     browser.open("")
-    # browser.element('.cart-label~.cart-qty').should(have.text('(3)'))
     browser.element('.ico-cart .cart-label').click()
+    with step('check cart size'):
+        browser.element('.cart-label~.cart-qty').should(have.text('(3)'))
 
 
 def test_gift_cards_match(demoshop, clean_cart):
@@ -119,8 +112,9 @@ def test_gift_cards_match(demoshop, clean_cart):
     browser.element('.product-title>[href="/25-virtual-gift-card"]').click()
     fill_recipient_info()
     response = demoshop.get('/cart')
-    assert recipient_info['name'], recipient_info['email'] in response.text
-    browser.element('.ico-cart .cart-label').click()
+    with step('Check recipient info'):
+        assert recipient_info['name'], recipient_info['email'] in response.text
+        browser.element('.ico-cart .cart-label').click()
 
 
 def test_books_match(demoshop, clean_cart):
@@ -134,7 +128,8 @@ def test_books_match(demoshop, clean_cart):
         book.click()
         browser.wait_until(book.should(be.clickable))
     response = demoshop.get('/cart')
-    assert '44.00' in response.text
+    with step('check total price'):
+        assert '44.00' in response.text
 
 
 def test_add_digital_downloads_to_wishlist(demoshop, clean_wishlist):
@@ -148,11 +143,12 @@ def test_add_digital_downloads_to_wishlist(demoshop, clean_wishlist):
     demoshop.post('/addproducttocart/details/52/2')
     browser.open("")
     browser.element('#topcartlink~li .ico-wishlist').click()
-    browser.element('.share-link').should(be.existing).click()
-    browser.all('.product>[href]').should(have.texts('3rd Album', 'Music 2', 'Music 2'))
+    with step('check wishlist content'):
+        browser.element('.share-link').should(be.existing).click()
+        browser.all('.product>[href]').should(have.texts('3rd Album', 'Music 2', 'Music 2'))
 
 
-def test_compare_desctop_PCs(demoshop):
+def test_compare_desktop_pc(demoshop, clear_compare_list):
     response = demoshop.post("/login", json={"Email": "demo_webshop@test.com", "Password": "123123"},
                              allow_redirects=False)
     authorization_cookie = response.cookies.get("NOPCOMMERCE.AUTH")
@@ -163,10 +159,16 @@ def test_compare_desctop_PCs(demoshop):
     browser.element('[type="radio"][value="65"]').click()
     browser.element('[type="radio"][value="55"]').click()
     browser.element('[type="radio"][value="58"]').click()
-    browser.element('[type="radio"][value="94"]').click()
+    browser.element('[type="checkbox"][value="94"]').click()
     browser.element('[type = "button"][value="Add to compare list"]').click()
-    browser.element('.clear-list').click()
-    browser.element('.page-body').should(have.text('You have no items to compare.'))
+    browser.open('https://demowebshop.tricentis.com/notebooks')
+    browser.element('.product-title>[href="/141-inch-laptop"]').click()
+    browser.element('[type = "button"][value="Add to compare list"]').click()
+    browser.save_screenshot('compare.png')
+    with step('check screenshot not empty'):
+        assert os.path.getsize('compare.png') != 0
+    os.remove('compare.png')
+
 
 
 

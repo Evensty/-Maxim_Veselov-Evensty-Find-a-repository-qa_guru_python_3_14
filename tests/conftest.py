@@ -5,22 +5,30 @@ from dotenv import load_dotenv
 from selene.support.conditions import have
 from selene.support.shared import browser
 
+from config import Hosts
+from framework.demoqa_with_env import DemoQaWithEnv
 from utils.base_session import BaseSession
-
 
 load_dotenv()
 
 
-@pytest.fixture(scope='session')
-def demoshop():
-    api_url = os.getenv("API_URL")
-    return BaseSession(api_url)
+def pytest_addoption(parser):
+    parser.addoption("--env")
+
+
+@pytest.fixture(scope="session")
+def env(request):
+    return request.config.getoption("--env")
 
 
 @pytest.fixture(scope='session')
-def reqres():
-    base_url = os.getenv('base_url')
-    return BaseSession(base_url)
+def demoshop(env):
+    return DemoQaWithEnv(env).demoqa
+
+
+@pytest.fixture(scope='session')
+def reqres(env):
+    return DemoQaWithEnv(env).reqres
 
 
 @pytest.fixture(autouse=True)
@@ -54,6 +62,9 @@ def clear_compare_list():
     yield
     browser.element('.clear-list').click()
     browser.element('.page-body').should(have.text('You have no items to compare.'))
+
+
+
 
 
 

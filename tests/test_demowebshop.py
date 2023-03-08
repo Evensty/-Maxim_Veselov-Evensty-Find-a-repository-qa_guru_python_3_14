@@ -8,6 +8,9 @@ from selene import have
 from selene.support.conditions import be
 from selene.support.shared import browser
 from dotenv import load_dotenv
+
+from framework.demoqa import DemoQA
+from framework.demoqa_with_env import DemoQaWithEnv
 from utils.base_session import BaseSession
 
 fake = Faker()
@@ -168,6 +171,34 @@ def test_compare_desktop_pc(demoshop, clear_compare_list):
     with step('check screenshot not empty'):
         assert os.path.getsize('compare.png') != 0
     os.remove('compare.png')
+
+
+def test_add_one_product_to_cart_authorized(demoshop):
+    """Тест с прокидыванием сессии во фреймворк"""
+    with step("Авторизоваться"):
+        demoqa = DemoQA(demoshop)
+        demoqa.authorization_cookie = demoqa.login(email=login, password=password)
+
+    with step("Добавление товара в корзину"):
+        result = demoqa.add_to_cart(cookies=demoqa.authorization_cookie)
+
+    with step("Товар добавлен в корзину"):
+        assert result.status_code == 200
+        assert 'The product has been added to your' in result.json()["message"]
+
+
+def test_add_one_product_to_cart_authorized_with_env(env):
+    """Тест с прокидыванием окружения во фреймворк"""
+    with step("Авторизоваться"):
+        demoqa = DemoQaWithEnv(env)
+        demoqa.authorization_cookie = demoqa.login(email=login, password=password)
+
+    with step("Добавление товара в корзину"):
+        result = demoqa.add_to_cart(cookies=demoqa.authorization_cookie)
+
+    with step("Товар добавлен в корзину"):
+        assert result.status_code == 200
+        assert 'The product has been added to your' in result.json()["message"]
 
 
 

@@ -2,7 +2,7 @@ import os
 
 import pytest
 from dotenv import load_dotenv
-from selene.support.conditions import have
+from selene.support.conditions import have, be
 from selene.support.shared import browser
 
 from framework.demoqa_with_env import DemoQaWithEnv
@@ -14,16 +14,18 @@ load_dotenv()
 def pytest_addoption(parser):
     parser.addoption("--env", default="prod")
 
+@pytest.fixture(scope="session")
+def env(request):
+    return request.config.getoption("--env")
+
 
 @pytest.fixture(scope='session')
-def demoshop(request):
-    env = request.config.getoption("--env")
+def demoshop(env):
     return DemoQaWithEnv(env)
 
 
 @pytest.fixture(scope='session')
-def reqres(request):
-    env = request.config.getoption("--env")
+def reqres(env):
     return DemoQaWithEnv(env).reqres
 
 
@@ -45,14 +47,24 @@ def demoshop_session(demoshop, cookie):
     browser.quit()
 
 
-@pytest.fixture()
-def clean_cart():
+@pytest.fixture(scope='function')
+def clean_cart(demoshop_session):
+    demoshop_session.open('https://demowebshop.tricentis.com/cart')
+    # if 'You have no items in your shopping cart.' not in demoshop_session.element('.mini-shopping-cart>.count').get(have.exact_text('You have no items in your shopping cart.)):
+    # if not demoshop_session.element('.mini-shopping-cart>.count').matching('You have no items in your shopping cart.'):
+    # if demoshop_session.element('.cart-label~.cart-qty').should(have.text('0'))
+    # if demoshop_session.element('.mini-shopping-cart>.total').should(be.existing):
+    #     demoshop_session.open('https://demowebshop.tricentis.com/cart')
+    #     for checkbox in demoshop_session.elements('[name="removefromcart"]'):
+    #         checkbox.click()
+    #     demoshop_session.element('[name="updatecart"]').click()
+    #     demoshop_session.element('.order-summary-content').should(have.text('Your Shopping Cart is empty!'))
     yield demoshop_session
-    browser.open('https://demowebshop.tricentis.com/cart')
-    for checkbox in browser.elements('[name="removefromcart"]'):
+    demoshop_session.open('https://demowebshop.tricentis.com/cart')
+    for checkbox in demoshop_session.elements('[name="removefromcart"]'):
         checkbox.click()
-    browser.element('[name="updatecart"]').click()
-    browser.element('.order-summary-content').should(have.text('Your Shopping Cart is empty!'))
+    demoshop_session.element('[name="updatecart"]').click()
+    demoshop_session.element('.order-summary-content').should(have.text('Your Shopping Cart is empty!'))
 
 
 @pytest.fixture()

@@ -20,6 +20,60 @@ class DemoQaWithEnv:
             allow_redirects=False
         )
 
+    def add_computing_and_internet_book_to_cart(self, **kwargs):
+        cookie = kwargs.get("cookies", None)
+        logging.info(cookie)
+        count = kwargs.get("count", 1)
+        response = None
+        for i in range(0, count):
+            response = self.demoqa.post('/addproducttocart/catalog/13/1/1', cookies=cookie)
+        return response
+
+    def add_book_fiction_to_cart(self, **kwargs):
+        cookie = kwargs.get("cookies", None)
+        logging.info(cookie)
+        count = kwargs.get("count", 1)
+        response = None
+        for i in range(0, count):
+            response = self.demoqa.post('/addproducttocart/catalog/22/1/1', cookies=cookie)
+        return response
+
+    def add_health_book_to_cart(self, **kwargs):
+        cookie = kwargs.get("cookies", None)
+        logging.info(cookie)
+        count = kwargs.get("count", 1)
+        response = None
+        for i in range(0, count):
+            response = self.demoqa.post('/addproducttocart/catalog/45/1/1', cookies=cookie)
+        return response
+
+    def add_3rd_album_to_wishlist(self, **kwargs):
+        cookie = kwargs.get("cookies", None)
+        logging.info(cookie)
+        count = kwargs.get("count", 1)
+        response = None
+        for i in range(0, count):
+            response = self.demoqa.post('/addproducttocart/details/53/2', cookies=cookie)
+        return response
+
+    def add_music2_blue_to_wishlist(self, **kwargs):
+        cookie = kwargs.get("cookies", None)
+        logging.info(cookie)
+        count = kwargs.get("count", 1)
+        response = None
+        for i in range(0, count):
+            response = self.demoqa.post('/addproducttocart/details/51/2', cookies=cookie)
+        return response
+
+    def add_music2_yellow_to_wishlist(self, **kwargs):
+        cookie = kwargs.get("cookies", None)
+        logging.info(cookie)
+        count = kwargs.get("count", 1)
+        response = None
+        for i in range(0, count):
+            response = self.demoqa.post('/addproducttocart/details/52/2', cookies=cookie)
+        return response
+
     @property
     def authorization_cookie(self):
         return self._authorization_cookie
@@ -29,11 +83,3 @@ class DemoQaWithEnv:
         """Записываем авторзационную куку"""
         self._authorization_cookie = {"NOPCOMMERCE.AUTH": response.cookies.get("NOPCOMMERCE.AUTH")}
 
-    def add_to_cart(self, **kwargs):
-        cookie = kwargs.get("cookies", None)
-        logging.info(cookie)
-        count = kwargs.get("count", 1)
-        response = None
-        for i in range(0, count):
-            response = self.demoqa.post('/addproducttocart/catalog/31/1/1', cookies=cookie)
-        return response
